@@ -57,6 +57,36 @@ curl -s "https://raw.githubusercontent.com/qdaxb/wtool/master/doc/get.sh" |bash 
 * `wtool hex [0x]number[b]`
 > 计算数字的10进制、16进制及2进制文本，输入参数默认为10进制，可选16进制（0x）及二进制（b）。
 
+## java命令
+* `wtool housemd pid [java_home]`
+> 使用housemd对java程序进行运行时跟踪，支持的操作有：
+> > - 查看加载类
+> > - 跟踪方法 
+> > - 查看环境变量
+> > - 查看对象属性值
+> 
+> 详细信息请参考[housemd说明文档](https://github.com/qdaxb/wtool/raw/master/java/tools/housemd.lib/README.md)
+
+* `wtool jarconfict path`
+> 查找jar包间冲突的类
+
+* `wtool jarfind classname path`
+> 在jar包中查找类名
+
+* `wtool jargrep "text" <path or jarfile>`
+> 在jar包中查找文本，可查找常量字符串、类引用。
+
+* `wtool findcycle [path]`
+> 查找当前工程中是否存在循环引用（目前仅支持maven工程，默认为当前路径）
+
+* `wtool jvm pid`
+> 执行jvm debug工具，包含对java栈、堆、线程、gc等状态的查看。
+> > * 进入jvm工具后可以输入序号执行对应命令
+> > * 可以一次执行多个命令，用分号";"分隔，如：1;3;4;5;6
+> > * 每个命令可以带参数，用冒号":"分隔，同一命令的参数之间用逗号分隔，如：1:1000,100;3;5:/data1/output.bin
+
+更多介绍请参考：
+https://github.com/qdaxb/wtool_java
 
 ## 目录说明
 ```
