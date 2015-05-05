@@ -1,0 +1,4 @@
+#!/bin/bash
+pcolumn (){
+    echo -e $1 |awk -F'\t' '{printf "%-15s%s\n",$1,$2}'
+}

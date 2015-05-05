@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+cd $WTOOL_DIR 
+today=`date "+%Y-%V"`
+if [ -f "~/.wtool/.dailycheck" ];then
+    if [ "`cat ~/.wtool/.dailycheck`" = "$today"  ];then
+	exit;
+    fi
+fi
+mkdir ~/.wtool >/dev/null 2>&1
+echo "$today" > ~/.wtool/.dailycheck
+set +e
+type "git" 1>/dev/null 2>/dev/null
+if [ ! $? -eq 0  ];then
+    exit 0;
+fi
+set -e
+diff=`git fetch -q && git log HEAD..origin/master --oneline |wc -l 2>/dev/null`
+if [ $diff -eq 0 ];then 
+    exit;
+fi
+echo ""
+echo "****NOTICE****"
+echo "Your wtool is behind master $diff version,use 'wtool update' to update."

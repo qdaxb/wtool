@@ -1,0 +1,17 @@
+#/bin/bash
+### encode string
+
+base_dir=$(dirname "$(echo "$0" | sed -e '')")
+if [ $# -eq 0 ];then
+    echo 'Usage : wtool encode "string" [type]'
+    echo ''
+    echo 'Available types: url(default) | utf8 | html | base64'
+    exit;
+fi
+query=$1
+type=$2
+if [ "$type" = "" ];then
+    type="url"
+fi
+echo "$type encoded string for '$query' :"
+php -f $base_dir/code.lib/code.php -- "encode" "$type" "$query"

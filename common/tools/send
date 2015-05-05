@@ -1,0 +1,14 @@
+#!/bin/bash
+### sending file by nc
+port=8888
+if [ $# -eq 0 ];then
+    echo 'Usage : wtool send file [port](default port is 8888)'
+    exit 1;
+fi
+file=$1;
+if [ $# -gt 1 ];then
+    port=$2;
+fi
+ip=`ifconfig | grep 'inet ' | grep -v '127.0.0.1' | head -n1 | awk '{print $2}'`
+echo "sending file '$file' on $ip $port "
+nc -l $port < $file

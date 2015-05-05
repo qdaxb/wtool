@@ -1,0 +1,30 @@
+#/bin/bash
+### hexadecimal conversion
+
+if [ $# = 0 ]; then
+    echo "Usage :wtool hex [0x]number[b]"
+    echo "number could be hexadecimal(0x),binary(b),or decimal(default)"
+    exit 0;
+fi
+input=$1
+echo $input | grep -q "^0x" 
+if [ $? = 0 ];then
+    hex_number=$input
+    dec_number=$(($input))
+    binary_number=`echo "obase=2;$dec_number"|bc`
+fi
+echo $input | grep -q "b$"
+if [ $? = 0 ]; then
+    binary_number=`echo $input |cut -c1-$((${#input}-1))`
+    dec_number=$((2#$binary_number))
+    hex_number=`printf "%x" $dec_number`
+fi
+
+if [ "$dec_number" = "" ]; then
+    dec_number=$input
+    hex_number=`printf "%x" $dec_number`
+    binary_number=`echo "obase=2;$dec_number"|bc`
+fi
+echo "2 : "$binary_number"b"
+echo "10: "$dec_number
+echo "16: "$hex_number

@@ -1,0 +1,50 @@
+#!/bin/bash
+### execute memcached command
+if [ $# -lt 2 ];then
+    echo 'Usage : wtool mc ip1[:port1][,ip2[:port2]] [port] "command"'
+    echo 'Note  : set command is wtool mc ip set key value [expire]'
+    exit;
+fi
+ip=$1
+shift;
+if [ $# -gt 0 2>/dev/null ];then
+    echo "$1" |egrep "^[0-9]+$" 2>&1 >/dev/null
+    if [ $? = 0 ];then
+	port=$1
+	uniq_port=1;
+	shift
+    fi
+fi
+cmd=$@
+if [ "$1" = "set" ];then
+    value=$3;
+    length=`printf "$value" |wc -c`
+    if [ "$4" = "" ];then
+	expire=0;
+    else
+	expire=$4;
+    fi
+    cmd="set $2 0 $expire $length\r\n$value"
+fi
+if [ -z $MC_CONTENT_ONLY ];then
+    echo $cmd
+fi
+array=(${ip//,/ }) ; 
+for i in "${!array[@]}"; do 
+    temp="${array[i]}"; 
+    arr=(${temp//:/ }); 
+    if [ "$port" = "" ];then
+	port=${arr[1]}
+	if [ "$port" = "" ];then
+	    echo "error param"
+	    exit;
+	fi
+    fi
+    if [ -z $MC_CONTENT_ONLY ];then
+	echo "${arr[0]}:${port}"; 
+    fi
+    printf "$cmd\r\n" | nc "${arr[0]}" "${port}"  
+    if [ "$uniq_port" = "" ];then
+	port=""
+    fi
+done

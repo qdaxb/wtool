@@ -1,0 +1,42 @@
+#!/bin/bash
+### execute redis command
+if [ $# -lt 2 ];then
+    echo 'Usage : wtool redis ip1[:port1][,ip2[:port2]] [port] "command"'
+    exit;
+fi
+ip=$1
+shift;
+if [ $1 -gt 0 2>/dev/null ];then
+    port=$1
+    uniq_port=1;
+    shift;
+fi
+
+array=(${ip//,/ }) ; 
+redis_cli=`which redis-cli`
+if [ "$redis_cli" = "" ];then
+    redis_cli=`locate bin/redis-cli |head -n 1`
+    if [ "$redis_cli" = "" ];then
+	echo 'no redis-cli found!'
+	exit;
+    else
+	echo "cannot found redis-cli in PATH,use $redis_cli"
+    fi
+fi
+for i in "${!array[@]}"; do 
+    temp="${array[i]}"; 
+    arr=(${temp//:/ }); 
+    if [ "$port" = "" ];then
+	port=${arr[1]}
+	if [ "$port" = "" ];then
+	    echo "error param"
+	    exit;
+	fi
+    fi
+    echo "${arr[0]}:${port}"; 
+    echo $@
+    ${redis_cli}  -h "${arr[0]}" -p "${port}" "$@"
+    if [ "$uniq_port" = "" ];then
+	port=""
+    fi
+done

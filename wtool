@@ -1,0 +1,113 @@
+#!/bin/bash
+
+export WTOOL_DIR=$(dirname "$(echo "$0" | sed -e '')")
+tools_dir=$WTOOL_DIR/*/tools/
+custom_tools_dir=$WTOOL_DIR/custom/*/tools/
+source $WTOOL_DIR/wtool-common
+bash $WTOOL_DIR/wtool-check-update & 2>/dev/null
+
+find_command(){
+    for folder in `ls -l $1 |grep ^d |awk '{print $9}'` ;do
+	if [ ! -d $1/$folder/tools ]; then
+	    continue;
+	fi
+	commands=`ls -l $1/$folder/tools |grep -v '^d' |awk '{print $9}'`
+	if [ "$commands" = "" ]; then
+	    continue;
+	fi
+	echo "$folder:"
+	for file in $commands ;do
+	    desp=`grep '^###' $1/$folder/tools/$file|cut -c 4-`
+	    if [ "$desp" != ""  ]; then
+		pcolumn "$file\t:$desp"
+	    fi
+	done
+    done
+
+}
+
+logo(){
+    echo "     __    __  _____            _ 
+    / / /\ \ \/__   \___   ___ | |
+    \ \/  \/ /  / /\/ _ \ / _ \| |
+     \  /\  /  / / | (_) | (_) | |
+      \/  \/   \/   \___/ \___/|_|
+                                     "
+}
+
+if [ $# = 0 ];then
+    logo
+    pcolumn 'Usage '
+    pcolumn " wtool list\t: show all commands \nwtool command\t: execute a command\nwtool update\t: update wtool\nwtool addmodule\t: add custom module\nwtool rmmodule\t: remove custom module"
+    exit
+fi
+
+if [ "$1" = "list" ];then 
+    echo 'Available commands:'
+    find_command $WTOOL_DIR
+    find_command $WTOOL_DIR/custom
+    exit 0;
+fi
+
+test_exists(){
+    if [ -e $2 ]; then
+	echo "$1/$2 already exist!"
+	while(true);do
+	    echo -n "(q)uit or (r)eplace?"
+	    read choice < /dev/tty
+	    if [ "$choice" = "q" ];then
+		exit 0;
+	    elif [ "$choice" = "r" ];then
+		rm -fr $1/$2
+		break;
+	    else
+		echo "$choice is not valid!"
+	    fi	
+	done
+    fi
+}
+
+if [ "$1" = "addmodule" ]; then
+    if [ "$#" -lt "2" ];then
+	echo "Usage : wtool addmodule group/project"
+	exit 1;
+    fi
+    folder_name=$2
+    folder_name=${folder_name//\//_}
+    cd $WTOOL_DIR/custom
+    test_exists $WTOOL_DIR/custom $folder_name
+    type "git" 1>/dev/null 2>/dev/null
+    if [ $? -eq 0 ];then
+	git clone https://github.com/$2.git --depth 1 $folder_name
+    else
+	mkdir $folder_name &&cd $folder_name
+	curl -s https://github.com/$2/repository/master.zip |unzip - 
+    fi
+    echo "add module $folder_name finished"
+    exit 0
+fi
+
+if [ "$1" = "rmmodule" ]; then
+    if [ "$#" -lt "2" ];then
+	echo "Usage : wtool rmmodule group/project"
+	exit 1;
+    fi
+    folder_name=$2
+    folder_name=${folder_name//\//_}
+    cd $WTOOL_DIR/custom
+    rm -rf ./$folder_name
+    echo "remove module $folder_name finished"
+    exit 0
+fi
+command_file=$1;shift
+command=`find $tools_dir -maxdepth 1 -name $command_file `
+
+if [ ! -f "$command" ]; then
+    command=`find $custom_tools_dir -maxdepth 1 -name $command_file `
+    if [ ! -f "$command" ]; then
+	echo "$command_file command not found!"
+	exit 1;
+    fi
+fi
+
+exec "$command" "$@"
