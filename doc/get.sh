@@ -29,7 +29,7 @@ do_download(){
     has_git=$?
     set -e
     if [ "$has_git" -eq 0 ];then
-	echo "fetching source from gitlab"
+	echo "fetching source from github"
 	do_fetch $fetch_dir;
     else
 	echo "can't locate git ,using archive mode."
