@@ -9,16 +9,12 @@
 # 系统需求
 * Mac/Linux
 * git 1.7.4+
-* expect（部分模块）
 * php4.0+（部分模块）
 
 # 安装
 ```
 curl -s "https://raw.githubusercontent.com/qdaxb/wtool/master/doc/get.sh" |bash -s 
 ```
-> * 无参数： 交互式安装
-> * install：自动安装
-> * download：仅下载
 
 # 使用
 ## 系统命令
