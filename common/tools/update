@@ -1,10 +1,13 @@
 #!/bin/bash
 
+echo "update wtool ..."
 cd $WTOOL_DIR && git pull
 for folder in `ls -l $WTOOL_DIR/custom |grep ^d |awk '{print $9}'` ;do
-    if [ ! -d $WTOOL_DIR/$folder/tools ]; then
+    if [ ! -d $WTOOL_DIR/custom/$folder/tools ]; then
 	continue;
     fi
-    cd $WTOOL_DIR/$folder && git pull
+    echo "update wtool/custom/$folder ..."
+    cd $WTOOL_DIR/custom/$folder && git pull
 done
 
+echo "update finished!"
