@@ -101,7 +101,7 @@ curl -s "https://raw.githubusercontent.com/qdaxb/wtool/master/doc/get.sh" |bash 
 >  进入jvm工具后可以输入序号执行对应命令  
 >  可以一次执行多个命令，用分号";"分隔，如：1;3;4;5;6  
 >  每个命令可以带参数，用冒号":"分隔，同一命令的参数之间用逗号分隔，如：  
->  Enter command queue:1:1000,100;3;5:/data1/output.bin
+>  Enter command queue:1:1000,100;3;5:/data1/output.bin  
 > 更多介绍请参考：https://github.com/qdaxb/wtool_java
 
 ## 目录说明
