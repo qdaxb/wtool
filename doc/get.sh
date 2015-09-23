@@ -104,6 +104,6 @@ main(){
 	    do_download `pwd`
 	    ;;
     esac
-    cd wtool && ./wtool addmodule qdaxb/wtool_java
+    ./wtool addmodule qdaxb/wtool_java
 }
 main "$@"
