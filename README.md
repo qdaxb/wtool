@@ -104,6 +104,8 @@ curl -s "https://raw.githubusercontent.com/qdaxb/wtool/master/doc/get.sh" |bash 
 >  Enter command queue:1:1000,100;3;5:/data1/output.bin  
 > 更多介绍请参考：https://github.com/qdaxb/wtool_java
 
+# 参与开发
+
 ## 目录说明
 ```
 .
@@ -112,3 +114,54 @@ curl -s "https://raw.githubusercontent.com/qdaxb/wtool/master/doc/get.sh" |bash 
 └── custom       # 自定义模块目录
 
 ``` 
+## 如何增加原生命令
+
+1. 在wtool根目录中创建文件夹，如：mygroup/tools
+2. 在tools文件夹中新建文件，文件名与命令名相同，如:mycommand，并对mycommand文件增加执行权限。
+3. 实现命令，每个命令是一个独立的shell脚本，如:
+
+    ```
+#!/bin/bash
+### this is desp
+echo "hello world"
+```
+
+4. 测试命令是否可用
+
+    ```
+$ wtool list                                                                                                                                                  ~/dev/wtool/mygroup/tools
+Available commands:
+mygroup:
+mycommand      : this is desp
+$ wtool mycomomand
+hello world
+```
+
+5. 提交PR:)
+
+## 如何开发自己的模块
+1. 在github上创建工程，如<https://github.com/qdaxb/demo_module>
+2. 在工程根目录中创建文件夹tools
+2. 在tools文件夹中新建文件，文件名与命令名相同，如:mycommand，并对mycommand文件增加执行权限。
+3. 实现命令，每个命令是一个独立的shell脚本，如:
+
+    ```
+#!/bin/bash
+### this is desp
+echo "hello world"
+```
+
+4. 使用方通过addmodule获取模块
+
+   ``` $ wtool addmodule qdaxb/demo_module```
+   
+5. enjoy
+
+    ```
+$ wtool list                                                                                                                                                  
+Available commands:
+qdaxb_demo_module:
+mycommand      : this is desp
+$ wtool mycomomand
+hello world
+```
