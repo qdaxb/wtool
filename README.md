@@ -15,6 +15,10 @@
 ```
 curl -s "https://raw.githubusercontent.com/qdaxb/wtool/master/doc/get.sh" |bash -s 
 ```
+# 卸载
+```
+wtool uninstall
+```
 
 # 使用
 ## 系统命令
