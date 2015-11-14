@@ -38,7 +38,7 @@ logo(){
 if [ $# = 0 ];then
     logo
     pcolumn 'Usage '
-    pcolumn " wtool list\t: show all commands \nwtool command\t: execute a command\nwtool update\t: update wtool\nwtool addmodule\t: add custom module\nwtool rmmodule\t: remove custom module"
+    pcolumn " wtool list\t: show all commands \nwtool command\t: execute a command\nwtool update\t: update wtool\nwtool addmodule\t: add custom module\nwtool rmmodule\t: remove custom module\nwtool uninstall\t: uninstall wtool"
     exit
 fi
 
@@ -81,7 +81,7 @@ if [ "$1" = "addmodule" ]; then
 	git clone https://github.com/$2.git --depth 1 $folder_name
     else
 	mkdir $folder_name &&cd $folder_name
-	curl -s https://github.com/$2/repository/master.zip |unzip - 
+	curl -s https://github.com/$2/repository/master.zip |unzip -
     fi
     echo "add module $folder_name finished"
     exit 0
@@ -97,6 +97,15 @@ if [ "$1" = "rmmodule" ]; then
     cd $WTOOL_DIR/custom
     rm -rf ./$folder_name
     echo "remove module $folder_name finished"
+    exit 0
+fi
+
+if [ "$1" = "uninstall" ]; then
+    echo -n "Uninstall wtool,(y)es or (n)o?"
+    read choice < /dev/tty
+    if [ "$choice" = "y" ] && [ "$WTOOL_DIR" != "/" ];then
+	cd $WTOOL_DIR && make uninstall && rm -rf $WTOOL_DIR && echo "wtool uninstall finished. Bye~"
+    fi
     exit 0
 fi
 command_file=$1;shift

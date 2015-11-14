@@ -14,4 +14,4 @@ install:
 	@chmod 755 wtool
 	@echo 'install finished! type "wtool" to show usages.'
 uninstall:
-	rm -f $(prefix)/bin/wtool
+	@rm -f $(prefix)/bin/wtool
