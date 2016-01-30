@@ -18,21 +18,22 @@ fi
 cmd=$@
 if [ "$1" = "set" ];then
     value=$3;
+    value=${value//\\/\\\\}
     length=`printf "$value" |wc -c`
     if [ "$4" = "" ];then
 	expire=0;
     else
 	expire=$4;
     fi
-    cmd="set $2 0 $expire $length\r\n$value"
+    cmd="set $2 0 $expire $length\r\n$value\r\n"
 fi
 if [ -z $MC_CONTENT_ONLY ];then
-    echo $cmd
+    echo -E "$cmd"
 fi
-array=(${ip//,/ }) ; 
-for i in "${!array[@]}"; do 
-    temp="${array[i]}"; 
-    arr=(${temp//:/ }); 
+array=(${ip//,/ }) ;
+for i in "${!array[@]}"; do
+    temp="${array[i]}";
+    arr=(${temp//:/ });
     if [ "$port" = "" ];then
 	port=${arr[1]}
 	if [ "$port" = "" ];then
@@ -41,9 +42,10 @@ for i in "${!array[@]}"; do
 	fi
     fi
     if [ -z $MC_CONTENT_ONLY ];then
-	echo "${arr[0]}:${port}"; 
+	echo "${arr[0]}:${port}";
     fi
-    printf "$cmd\r\n" | nc "${arr[0]}" "${port}"  
+
+    printf "$cmd" | nc "${arr[0]}" "${port}"
     if [ "$uniq_port" = "" ];then
 	port=""
     fi
