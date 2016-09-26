@@ -94,7 +94,7 @@ add_module() {
 	curl -q -L https://github.com/$2/archive/master.zip >master.zip &&unzip master.zip && rm -f master.zip
     fi
     echo "add module $folder_name finished"
-    list_module
+    cd .. && list_module
     exit 0
 }
 
