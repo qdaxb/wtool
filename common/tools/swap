@@ -1,0 +1,91 @@
+#!/bin/bash
+### show swap used by each process
+
+function getswap {
+    SORTED=$1
+    REVERSE=$2
+    GREP_OPTARG=$3
+
+    SUM=0
+    OVERALL=0
+    STATISTICS=""
+    for DIR in `find /proc/ -maxdepth 1 -type d | egrep "^/proc/[0-9]"` ; do
+        PID=`echo $DIR | cut -d / -f 3`
+        PROGNAME=`ps -p $PID -o comm --no-headers`
+        if [ "$GREP_OPTARG"x != ""x ]; then
+            PROGNAME=`echo $PROGNAME | grep -e $GREP_OPTARG`
+            if [ "$PROGNAME"x == ""x ]; then
+                continue      
+            fi 
+        fi
+        
+        for SWAP in `grep Swap $DIR/smaps 2>/dev/null| awk '{ print $2 }'` 
+        do
+            let SUM=$SUM+$SWAP
+        done
+
+        if [ $SUM != 0 ] ; then
+            if [ $SORTED == true ] ; then
+                STATISTICS=$STATISTICS+"PID=$PID - Swap used: $SUM k - ($PROGNAME )\n"
+            else
+                echo "PID=$PID - Swap used: $SUM k - ($PROGNAME )"
+            fi
+        fi
+
+        let OVERALL=$OVERALL+$SUM
+        SUM=0
+    done
+
+    if [ $SORTED == true ]; then
+        if [ $REVERSE == true ]; then
+            echo -e $STATISTICS | sort -nk 5 -r 
+        else 
+            echo -e $STATISTICS | sort -nk 5 
+        fi
+    fi
+
+    echo "Overall swap used: $OVERALL k"
+}
+
+SORTED=false
+REVERSE=false
+GREP_OPTARG=""
+
+while getopts "hsrg:" arg
+do
+    case $arg in 
+            s)
+               SORTED=true
+               ;;
+            r)
+               REVERSE=true
+               ;;
+            g)
+               GREP_OPTARG=$OPTARG 
+               ;;
+            h)
+               echo -e "Usage: sudo wtool swap [-s[-r]] [-g GREP_ARG] 
+
+-s sorted by swap used 
+-r sorted reverse 
+-g find specified process by 'grep' command 
+                       "
+               exit 0
+              ;;
+            ?)  
+               echo -e "Usage: sudo wtool swap [-s[-r]] [-g GREP_ARG] 
+                               
+-s sorted by swap used 
+-r sorted reverse 
+-g find specified process by 'grep' command 
+                       "
+               exit 1 ;;
+    esac
+done   
+
+if [ ! -f "/proc" ]; then
+    echo "cannot read infomation from /proc, exit!"
+    exit 1
+fi
+getswap $SORTED $REVERSE $GREP_OPTARG
+

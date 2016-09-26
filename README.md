@@ -57,6 +57,14 @@ wtool uninstall
 * `wtool hex [0x]number[b]`
 > 计算数字的10进制、16进制及2进制文本，输入参数默认为10进制，可选16进制（0x）及二进制（b）。
 
+* `sudo wtool swap [-s [-r]] [-g GREP_ARG]`
+> 查询当前服务器各个进程占用swap的情况。
+> >-s 表示对swap占用量进行排序（升序）
+> >-r 表示对swap占用量进行排序（降序），使用-r的前提是-s参数开启。
+> >-g grep命令的封装，用于查找特定类型的进程。比如我想查找带有java的进程，可以使用`sudo wtool swap -g java`
+>
+> 注意，使用该功能需要sudo权限
+
 ## java命令
 * `wtool housemd pid [java_home]`
 > 使用housemd对java程序进行运行时跟踪，支持的操作有：
