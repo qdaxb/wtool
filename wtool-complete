@@ -1,0 +1,13 @@
+script_path=$_
+if [ -n "$BASH_SOURCE" ]; then
+    base_dir=$(dirname "$BASH_SOURCE")
+elif [ -n "$script_path" ]; then
+    base_dir=$(dirname "$script_path")
+else
+    base_dir=$(dirname "$(echo "$0" | sed -e '')")
+fi
+if [ -n "$ZSH_VERSION" ]; then
+    source $base_dir/common/lib/complete.zsh
+else
+    source $base_dir/common/lib/complete.bash
+fi

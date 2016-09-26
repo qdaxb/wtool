@@ -1,39 +1,18 @@
 #!/bin/bash
 
 export WTOOL_DIR=$(dirname "$(echo "$0" | sed -e '')")
-tools_dir=$WTOOL_DIR/*/tools/
-custom_tools_dir=$WTOOL_DIR/custom/*/tools/
+
+# load common lib functions
 source $WTOOL_DIR/wtool-common
-bash $WTOOL_DIR/wtool-check-update & 2>/dev/null
 
-find_command(){
-    for folder in `ls -l $1 |grep ^d |awk '{print $9}'` ;do
-	if [ ! -d $1/$folder/tools ]; then
-	    continue;
-	fi
-	commands=`ls -l $1/$folder/tools |grep -v '^d' |awk '{print $9}'`
-	if [ "$commands" = "" ]; then
-	    continue;
-	fi
-	echo "$folder:"
-	for file in $commands ;do
-	    desp=`grep '^###' $1/$folder/tools/$file|cut -c 4-`
-	    if [ "$desp" != ""  ]; then
-		pcolumn "$file\t:$desp"
-	    fi
-	done
-    done
+# load rcfile
+rcfile="$WTOOL_DIR/wtoolrc"
+[ -r "$rcfile" ] && source "$rcfile"
+custom_rcfile="${HOME}/.wtoolrc"
+[ -r "$custom_rcfile" ] && source "$custom_rcfile"
 
-}
-
-logo(){
-    echo "     __    __  _____            _ 
-    / / /\ \ \/__   \___   ___ | |
-    \ \/  \/ /  / /\/ _ \ / _ \| |
-     \  /\  /  / / | (_) | (_) | |
-      \/  \/   \/   \___/ \___/|_|
-                                     "
-}
+# check update
+[ "$WTOOL_DAILYCHECK" == "true"  ] && bash $WTOOL_DIR/wtool-check-update & 2>/dev/null
 
 if [ $# = 0 ];then
     logo
@@ -43,71 +22,23 @@ if [ $# = 0 ];then
 fi
 
 if [ "$1" = "list" ];then 
-    echo 'Available commands:'
-    find_command $WTOOL_DIR
-    find_command $WTOOL_DIR/custom
-    exit 0;
+    list_module "$@"
 fi
 
-test_exists(){
-    if [ -e $2 ]; then
-	echo "$1/$2 already exist!"
-	while(true);do
-	    echo -n "(q)uit or (r)eplace?"
-	    read choice < /dev/tty
-	    if [ "$choice" = "q" ];then
-		exit 0;
-	    elif [ "$choice" = "r" ];then
-		rm -fr $1/$2
-		break;
-	    else
-		echo "$choice is not valid!"
-	    fi	
-	done
-    fi
-}
-
 if [ "$1" = "addmodule" ]; then
-    if [ "$#" -lt "2" ];then
-	echo "Usage : wtool addmodule group/project"
-	exit 1;
-    fi
-    folder_name=$2
-    folder_name=${folder_name//\//_}
-    cd $WTOOL_DIR/custom
-    test_exists $WTOOL_DIR/custom $folder_name
-    type "git" 1>/dev/null 2>/dev/null
-    if [ $? -eq 0 ];then
-	git clone https://github.com/$2.git --depth 1 $folder_name
-    else
-	mkdir $folder_name &&cd $folder_name
-	curl -s https://github.com/$2/repository/master.zip |unzip -
-    fi
-    echo "add module $folder_name finished"
-    exit 0
+    add_module "$@"
 fi
 
 if [ "$1" = "rmmodule" ]; then
-    if [ "$#" -lt "2" ];then
-	echo "Usage : wtool rmmodule group/project"
-	exit 1;
-    fi
-    folder_name=$2
-    folder_name=${folder_name//\//_}
-    cd $WTOOL_DIR/custom
-    rm -rf ./$folder_name
-    echo "remove module $folder_name finished"
-    exit 0
+    remove_module "$@"
 fi
 
 if [ "$1" = "uninstall" ]; then
-    echo -n "Uninstall wtool,(y)es or (n)o?"
-    read choice < /dev/tty
-    if [ "$choice" = "y" ] && [ "$WTOOL_DIR" != "/" ];then
-	cd $WTOOL_DIR && make uninstall && rm -rf $WTOOL_DIR && echo "wtool uninstall finished. Bye~"
-    fi
-    exit 0
+    uninstall "$@"
 fi
+
+tools_dir=$WTOOL_DIR/*/tools/
+custom_tools_dir=$WTOOL_DIR/custom/*/tools/
 command_file=$1;shift
 command=`find $tools_dir -maxdepth 1 -name $command_file `
 
